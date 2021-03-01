@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import SubHeader from '../Header/SubHeader';
 import HotelItem from '../Hotels/HotelItem';
+import ReviewItem from './ReviewItem';
 
 const ReviewsWrapper = styled.div`
   display: flex;
@@ -20,19 +21,26 @@ const Detail = ({ match, history }) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [hotel, setHotel] = useState(false)
+  const [reviews, setReviews] = useState([])
   
   useEffect(() => {
-    if (!hotel) {
-      console.log(match)
-      fetch(`https://my-json-server.typicode.com/royderks/react-context-hooks-workshop/hotels/${match.params.id}`)
-      .then(response => response.json())
-      .then(data => {
-        setHotel(data)
-        setLoading(false)
-      })
-      .catch(() => setError(true));
-    }
-  }, [hotel, match])
+    fetch(`https://my-json-server.typicode.com/royderks/react-context-hooks-workshop/hotels/${match.params.id}`)
+    .then(response => response.json())
+    .then(data => {
+      setHotel(data)
+      setLoading(false)
+    })
+    .catch(() => setError(true));
+  }, [match.params.id])
+
+  useEffect(() => {
+    fetch(`https://my-json-server.typicode.com/royderks/react-context-hooks-workshop/hotels/${hotel.id}/reviews`)
+    .then(response => response.json())
+    .then(data => {
+      setReviews(data)
+    })
+    .catch(() => setError(true));
+  }, [hotel.id])
 
   return !loading && !error ? (
     <>
@@ -46,7 +54,11 @@ const Detail = ({ match, history }) => {
       <HotelItem data={hotel} />
 
       <h3>Reviews:</h3>
-      <ReviewsWrapper></ReviewsWrapper>
+      <ReviewsWrapper>
+        {reviews && reviews.length && reviews.map(review => {
+          return <ReviewItem data={review} />
+        })}
+      </ReviewsWrapper>
     </>
   ) : (
     <Alert>{loading ? 'Loading...' : error}</Alert>
