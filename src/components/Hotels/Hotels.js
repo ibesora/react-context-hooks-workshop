@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import SubHeader from '../Header/SubHeader';
 import HotelItem from './HotelItem';
 import { useHotelsContext } from './HotelsContext';
+import { useEffect } from 'react';
 
 const HotelItemsWrapper = styled.div`
   display: flex;
@@ -22,7 +23,11 @@ const Alert = styled.span`
 `;
 
 const Hotels = ({ history }) => {
-  const { loading, error, hotels } = useHotelsContext()
+  const { loading, error, hotels, getHotels } = useHotelsContext()
+
+  useEffect(() => {
+    (!hotels || hotels.length === 0) && getHotels()
+  }, [getHotels, hotels])
 
   return !loading && !error ? (
     <>

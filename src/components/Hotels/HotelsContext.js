@@ -1,4 +1,4 @@
-import { useReducer, useEffect, createContext, useContext } from 'react'
+import { useReducer, useEffect, createContext, useContext, useMemo } from 'react'
 
 const HotelsContext = createContext(null)
 
@@ -9,6 +9,12 @@ const reducer = (state, action) => {
         error: false,
         loading: false,
         hotels: action.payload
+      }
+    case 'setHotel':
+      return {
+        error: false,
+        loading: false,
+        hotel: action.payload
       }
     case 'setError':
       return {
@@ -22,10 +28,10 @@ const reducer = (state, action) => {
 }
 
 export const HotelsContextProvider = ({children}) => {
-  const [ data, dispatch ] = useReducer(reducer, { hotels: [], loading: true, error: false })
+  const [ data, dispatch ] = useReducer(reducer, { hotels: [], hotel: {}, loading: true, error: false })
 
-  useEffect(() => {
-    if (data.hotels.length === 0) {
+  const getHotels = useMemo(() => {
+    return () => {
       fetch('https://my-json-server.typicode.com/royderks/react-context-hooks-workshop/hotels')
       .then(response => response.json())
       .then(data => {
@@ -33,11 +39,32 @@ export const HotelsContextProvider = ({children}) => {
       })
       .catch(() => dispatch({type: 'setError', payload: true}))
     }
-  }, [data.hotels.length])
+  }, [])
+
+  const getHotel = useMemo(() => {
+    return (id) => {
+      const hotel = (data.hotels || []).find(h => h.id.toString() === id)
+      if (hotel) dispatch({type: 'setHotel', payload: hotel})
+      else {
+        fetch(`https://my-json-server.typicode.com/royderks/react-context-hooks-workshop/hotels/${id}`)
+        .then(response => response.json())
+        .then(data => {
+          dispatch({type: 'setHotel', payload: data})
+        })
+        .catch(() => dispatch({type: 'setError', payload: true}))
+      }
+    }
+  }, [data.hotels])
+
 
   return (
     <HotelsContext.Provider
-      value={data}
+      value={{
+          ...data,
+          getHotels,
+          getHotel
+        }
+      }
     >
       {children}
     </HotelsContext.Provider>

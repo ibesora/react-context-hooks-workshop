@@ -20,10 +20,13 @@ const Alert = styled.span`
 
 const Detail = ({ match, history }) => {
   const { loading: loadingReviews, error: errorReviews, reviews, getHotelReviews } = useReviewsContext()
-  const { loading: loadingHotels, error: errorHotels, hotels } = useHotelsContext()
-  const hotel = hotels && hotels.find(h => h.id.toString() === match.params.id)
+  const { loading: loadingHotels, error: errorHotels, hotel, getHotel } = useHotelsContext()
   const loading = loadingHotels || loadingReviews
   const error = errorReviews || errorHotels
+
+  useEffect(() => {
+    !(hotel || {}).id && getHotel(match.params.id)
+  }, [hotel, getHotel, match.params.id])
 
   useEffect(() => {
     if (hotel) {
