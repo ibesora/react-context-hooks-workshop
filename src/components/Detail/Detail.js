@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import styled from 'styled-components';
 import SubHeader from '../Header/SubHeader';
 import HotelItem from '../Hotels/HotelItem';
 import ReviewItem from './ReviewItem';
+import HotelsContext from '../Hotels/HotelsContext';
 
 const ReviewsWrapper = styled.div`
   display: flex;
@@ -20,27 +21,22 @@ const Detail = ({ match, history }) => {
   // Get this information from the API
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
-  const [hotel, setHotel] = useState(false)
   const [reviews, setReviews] = useState([])
-  
-  useEffect(() => {
-    fetch(`https://my-json-server.typicode.com/royderks/react-context-hooks-workshop/hotels/${match.params.id}`)
-    .then(response => response.json())
-    .then(data => {
-      setHotel(data)
-      setLoading(false)
-    })
-    .catch(() => setError(true));
-  }, [match.params.id])
+  const { hotels } = useContext(HotelsContext)
+
+  const hotel = hotels && hotels.find(h => h.id.toString() === match.params.id)
 
   useEffect(() => {
-    fetch(`https://my-json-server.typicode.com/royderks/react-context-hooks-workshop/hotels/${hotel.id}/reviews`)
-    .then(response => response.json())
-    .then(data => {
-      setReviews(data)
-    })
-    .catch(() => setError(true));
-  }, [hotel.id])
+    if (hotel) {
+      fetch(`https://my-json-server.typicode.com/royderks/react-context-hooks-workshop/hotels/${hotel.id}/reviews`)
+      .then(response => response.json())
+      .then(data => {
+        setReviews(data)
+        setLoading(false)
+      })
+      .catch(() => setError(true));
+    }
+  }, [hotel])
 
   return !loading && !error ? (
     <>

@@ -1,0 +1,35 @@
+import { useState, useEffect, createContext } from 'react'
+
+const HotelsContext = createContext(null)
+
+export const HotelsContextProvider = ({children}) => {
+  const [hotels, setHotels] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+
+  useEffect(() => {
+    if (hotels.length === 0) {
+      fetch('https://my-json-server.typicode.com/royderks/react-context-hooks-workshop/hotels')
+      .then(response => response.json())
+      .then(data => {
+        setHotels(data)
+        setLoading(false)
+      })
+      .catch(() => setError(true));
+    }
+  }, [hotels.length])
+
+  return (
+    <HotelsContext.Provider
+      value={{
+        loading,
+        error,
+        hotels,
+      }}
+    >
+      {children}
+    </HotelsContext.Provider>
+  )
+}
+
+export default HotelsContext
