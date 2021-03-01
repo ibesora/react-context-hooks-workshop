@@ -18,25 +18,14 @@ const Alert = styled.span`
 `;
 
 const Detail = ({ match, history }) => {
-  // Get this information from the API
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
-  const [reviews, setReviews] = useState([])
-  const { hotels } = useContext(HotelsContext)
-
+  const { loading, error, hotels, reviews, getHotelReviews } = useContext(HotelsContext)
   const hotel = hotels && hotels.find(h => h.id.toString() === match.params.id)
 
   useEffect(() => {
     if (hotel) {
-      fetch(`https://my-json-server.typicode.com/royderks/react-context-hooks-workshop/hotels/${hotel.id}/reviews`)
-      .then(response => response.json())
-      .then(data => {
-        setReviews(data)
-        setLoading(false)
-      })
-      .catch(() => setError(true));
+      getHotelReviews(hotel.id)
     }
-  }, [hotel])
+  }, [hotel, getHotelReviews])
 
   return !loading && !error ? (
     <>
@@ -52,7 +41,7 @@ const Detail = ({ match, history }) => {
       <h3>Reviews:</h3>
       <ReviewsWrapper>
         {reviews && reviews.length && reviews.map(review => {
-          return <ReviewItem data={review} />
+          return <ReviewItem key={review.id} data={review} />
         })}
       </ReviewsWrapper>
     </>
