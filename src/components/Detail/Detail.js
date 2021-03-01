@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import SubHeader from '../Header/SubHeader';
 import HotelItem from '../Hotels/HotelItem';
@@ -17,9 +17,22 @@ const Alert = styled.span`
 
 const Detail = ({ match, history }) => {
   // Get this information from the API
-  const loading = true;
-  const error = false;
-  const hotel = false;
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+  const [hotel, setHotel] = useState(false)
+  
+  useEffect(() => {
+    if (!hotel) {
+      console.log(match)
+      fetch(`https://my-json-server.typicode.com/royderks/react-context-hooks-workshop/hotels/${match.params.id}`)
+      .then(response => response.json())
+      .then(data => {
+        setHotel(data)
+        setLoading(false)
+      })
+      .catch(() => setError(true));
+    }
+  }, [hotel, match])
 
   return !loading && !error ? (
     <>
