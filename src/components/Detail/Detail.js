@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import SubHeader from '../Header/SubHeader';
 import HotelItem from '../Hotels/HotelItem';
 import ReviewItem from './ReviewItem';
-import HotelsContext from '../Hotels/HotelsContext';
+import { useHotelsContext } from '../Hotels/HotelsContext';
 
 const ReviewsWrapper = styled.div`
   display: flex;
@@ -18,7 +18,7 @@ const Alert = styled.span`
 `;
 
 const Detail = ({ match, history }) => {
-  const { loading, error, hotels, reviews, getHotelReviews } = useContext(HotelsContext)
+  const { loading, error, hotels, reviews, getHotelReviews } = useHotelsContext()
   const hotel = hotels && hotels.find(h => h.id.toString() === match.params.id)
 
   useEffect(() => {
